@@ -24,14 +24,14 @@ UPDATE_IP_URL = 'https://www.dnsmadeeasy.com/servlet/updateip'
 
 def error(*objs):
     print("ERROR:", *objs, file=sys.stderr)
+    return False
 
 def check_ssl(url):
     try:
         r = requests.get(url, verify=True)
         return True
     except requests.exceptions.SSLError:
-        error('The SSL certificate for {0} is not valid.'.format(url))
-        return False
+        return error('The SSL certificate for {0} is not valid.'.format(url))
 
 def get_current_ip(url=GET_IP_URL):
     r = requests.get(url)
@@ -45,8 +45,7 @@ def get_dns_ip(name=RECORD_NAME, target='A'):
 
 def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
     if not ip:
-        error('Could not determine the current IP.')
-        return False
+        return error('Could not determine the current IP.')
     if not check_ssl(url):
         return False
     params = {
