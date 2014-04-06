@@ -25,6 +25,14 @@ UPDATE_IP_URL = 'https://www.dnsmadeeasy.com/servlet/updateip'
 def error(*objs):
     print("ERROR:", *objs, file=sys.stderr)
 
+def check_ssl(url):
+    try:
+        r = requests.get(url, verify=True)
+        return True
+    except requests.exceptions.SSLError:
+        error('The SSL certificate for {0} is not valid.'.format(url))
+        return False
+
 def get_current_ip(url=GET_IP_URL):
     r = requests.get(url)
     ip = r.text.strip()
@@ -35,16 +43,19 @@ def get_dns_ip(name=RECORD_NAME, target='A'):
     ip = str(q[0]).strip()
     return ip
 
-def update_ip_to_dns(ip=False, api_url=UPDATE_IP_URL):
+def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
     if not ip:
-        ip = get_current_ip()
+        error('Could not determine the current IP.')
+        return False
+    if not check_ssl(url):
+        return False
     params = {
         'username': USERNAME,
         'password': PASSWORD,
         'id': RECORD_ID,
         'ip': ip,
     }
-    r = requests.get(api_url, params=params)
+    r = requests.get(url, params=params)
     return r
 
 if __name__ == '__main__':
@@ -55,13 +66,13 @@ if __name__ == '__main__':
         print('No changes for DNS record {0} to report.'.format(RECORD_NAME))
     else:
         print('Current IP differs with DNS record, attempting to update DNS.')
-        r = update_ip_to_dns(current_ip)
-        if r.text == 'success':
+        request = update_ip_to_dns(current_ip)
+        if request and request.text == 'success':
             msg = 'Updating record for {0} to {1} was succesful'.format(
                 RECORD_NAME, current_ip)
             print(msg)
         else:
-            msg = 'ERROR: Updating record for {0} to {1} failed.'.format(
+            msg = 'Updating record for {0} to {1} failed.'.format(
                 RECORD_NAME, current_ip)
             error(msg)
             exit_code = 1
