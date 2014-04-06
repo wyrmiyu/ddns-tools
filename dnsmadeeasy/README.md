@@ -17,9 +17,9 @@ The update itself is done via the documented API provided by Dnsmadeeasy. Furthe
 
 #### TTL and cron
 
-As the DNS TIme-To-Live value sets caching time for your record your DNS update won't show up for your script until the TTL has run off. Therefore you should see that cron and TTL are in sync in this matter, so that you won't end up having redundant updates to Dnsmadeeasy.
+As the DNS TIme-To-Live value sets the caching time for your record, your DNS update won't show up for your script until the TTL has run off. Therefore you should see that cron and TTL are somewhat in sync in this matter, so that you won't end up having redundant updates to Dnsmadeeasy.
 
-If you set the script run from cron for example once per 10 minutes, then set your TTL to 600 seconds respectively.
+If you set the script to run from cron - for example - once per 10 minutes, then set your TTL to 600 seconds respectively.
 
 ### To-Do
   * Implement debug-mode to include verbosity for error messages and traces
