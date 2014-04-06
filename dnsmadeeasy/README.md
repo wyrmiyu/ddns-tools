@@ -13,7 +13,7 @@ Currently the script uses ["myip" web-page by Dnsmadeeasy](http://www.dnsmadeeas
 to determine client's current IP. It then compares it to the actual DNS record and in case
 the IPs differ, the script will attempt to update the record. 
 
-The update is attempted via the API (HTTPS) provided by Dnsmadeeasy.
+The update itself is done via the documented API provided by Dnsmadeeasy. Further the script ensures that the SSL certificate of dnsmadeeasy.com is valid one, before attempting the update.
 
 #### TTL and cron
 
