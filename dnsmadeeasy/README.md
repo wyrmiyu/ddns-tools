@@ -18,4 +18,8 @@ The update is attempted via the API (HTTPS) provided by Dnsmadeeasy.
 ### To-Do
   * Implement debug-mode to include verbosity for error messages and traces
   * Replace inline glob-based confs with ConfigParser and/or argparse
+  * Take account of TTL in the script, so that cron can run more frequently and TTL does not need to be too low
+  * Add support for a local IP history
   * Add support for determing current IP from a specified NIC.
+  
+  
