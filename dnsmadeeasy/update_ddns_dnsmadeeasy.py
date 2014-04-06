@@ -54,8 +54,7 @@ def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
         'id': RECORD_ID,
         'ip': ip,
     }
-    r = requests.get(url, params=params)
-    return r
+    return requests.get(url, params=params)
 
 if __name__ == '__main__':
     exit_code = 0
