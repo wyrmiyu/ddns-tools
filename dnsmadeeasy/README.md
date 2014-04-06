@@ -11,7 +11,7 @@ Requires following non-core modules;
 ### What it does?
 
 Currently the script uses ["myip" web-page by Dnsmadeeasy](http://www.dnsmadeeasy.com/myip.jsp)
-to determine client's current IP. It's then compared to the actual DNS record and in case
+to determine client's current IP. It then compares it to the actual DNS record and in case
 the IPs differ, the script will attempt to update the record. 
 
 The update is attempted via the API (HTTPS) provided by Dnsmadeeasy.
