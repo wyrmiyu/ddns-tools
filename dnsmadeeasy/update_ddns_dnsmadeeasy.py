@@ -22,8 +22,8 @@ RECORD_NAME = 'recordname.example.com' # <- REPLACE
 GET_IP_URL = 'http://www.dnsmadeeasy.com/myip.jsp'
 UPDATE_IP_URL = 'https://www.dnsmadeeasy.com/servlet/updateip'
 
-def warning(*objs):
-    print("WARNING: ", *objs, file=sys.stderr)
+def error(*objs):
+    print("ERROR:", *objs, file=sys.stderr)
 
 def get_current_ip(url=GET_IP_URL):
     r = requests.get(url)
@@ -63,6 +63,6 @@ if __name__ == '__main__':
         else:
             msg = 'ERROR: Updating record for {0} to {1} failed.'.format(
                 RECORD_NAME, current_ip)
-            print(msg, file=sys.stderr)
+            error(msg)
             exit_code = 1
     sys.exit(exit_code)
