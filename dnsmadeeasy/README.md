@@ -1,6 +1,6 @@
 ## update_ddns_dnsmadeeasy.py
 
-Script to update dynamic DNS records at Dnsmadeeasy with HTTPS support.
+Script to update dynamic DNS records at Dnsmadeeasy with HTTPS support.  
 Change globs to reflect your settings and set the script to run from cron.
 
 Requires following non-core modules:
