@@ -15,33 +15,38 @@ import sys
 import requests
 import dns.resolver
 
-USERNAME = 'your_username' # <- REPLACE
-PASSWORD = 'dns_record_password' # <- REPLACE
-RECORD_ID = 'dns_record_id' # <- REPLACE
-RECORD_NAME = 'recordname.example.com' # <- REPLACE
+USERNAME = 'your_username'  # <- REPLACE
+PASSWORD = 'dns_record_password'  # <- REPLACE
+RECORD_ID = 'dns_record_id'  # <- REPLACE
+RECORD_NAME = 'recordname.example.com'  # <- REPLACE
 GET_IP_URL = 'http://www.dnsmadeeasy.com/myip.jsp'
 UPDATE_IP_URL = 'https://www.dnsmadeeasy.com/servlet/updateip'
+
 
 def error(*objs):
     print("ERROR:", *objs, file=sys.stderr)
     return False
 
+
 def check_ssl(url):
     try:
-        r = requests.get(url, verify=True)
+        requests.get(url, verify=True)
         return True
     except requests.exceptions.SSLError:
         return error('The SSL certificate for {0} is not valid.'.format(url))
+
 
 def get_current_ip(url=GET_IP_URL):
     r = requests.get(url)
     ip = r.text.strip()
     return ip
 
+
 def get_dns_ip(name=RECORD_NAME, target='A'):
     q = dns.resolver.query(name, target)
     ip = str(q[0]).strip()
     return ip
+
 
 def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
     if not ip:
