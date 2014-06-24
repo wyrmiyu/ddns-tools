@@ -29,6 +29,7 @@ RECORD_NAME = 'www.domain.com'  # <- REPLACE
 
 # If the EXPORTJSONPATH param is set, the script will additionally for each domain json export file the record name,
 # passwords and ids. You can export the JSON-Files from your DNSmadeeasy control-panel (under the tab "Reporting").
+# The script assumes you put all the JSON exports into one folder and point to it by setting the EXPORTJSONPATH param.
 # This script supports different passwords for subdomains in each domain by creating a new Request for each unique PW.
 EXPORTJSONPATH = None
 #EXPORTJSONPATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "domains-exports/")
