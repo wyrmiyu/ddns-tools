@@ -13,12 +13,13 @@
 from __future__ import print_function
 import sys
 import requests
-import dns.resolver
+from dns.resolver import Resolver
 
 USERNAME = 'your_username'  # <- REPLACE
 PASSWORD = 'dns_record_password'  # <- REPLACE
 RECORD_ID = 'dns_record_id'  # <- REPLACE
 RECORD_NAME = 'recordname.example.com'  # <- REPLACE
+RECORD_NAMESERVERS = ('0.0.0.0',)  # <- REPLACE
 GET_IP_URL = 'http://www.dnsmadeeasy.com/myip.jsp'
 UPDATE_IP_URL = 'https://www.dnsmadeeasy.com/servlet/updateip'
 
@@ -42,8 +43,10 @@ def get_current_ip(url=GET_IP_URL):
     return ip
 
 
-def get_dns_ip(name=RECORD_NAME, target='A'):
-    q = dns.resolver.query(name, target)
+def get_dns_ip(name=RECORD_NAME, target='A', nameservers=RECORD_NAMESERVERS):
+    resolver = Resolver(configure=False)
+    resolver.nameservers = RECORD_NAMESERVERS
+    q = resolver.query(name, target)
     ip = str(q[0]).strip()
     return ip
 
