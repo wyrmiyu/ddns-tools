@@ -40,8 +40,9 @@ def get_current_ip(url=None):
     return ip
 
 
-def get_dns_ip(name=RECORD_NAME, target='A'):
-    bits = RECORD_NAME.split('.')
+def get_dns_ip(name=None, target='A'):
+    name = name or RECORD_NAME
+    bits = name.split('.')
     while bits:
         try:
             ns = str(dns.resolver.query('.'.join(bits), 'NS')[0])
