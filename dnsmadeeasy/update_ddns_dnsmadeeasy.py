@@ -11,6 +11,7 @@
 # License: MIT, https://github.com/wyrmiyu/ddns-tools/blob/master/LICENSE
 
 from __future__ import print_function
+import socket
 import sys
 import requests
 import dns.resolver
@@ -43,9 +44,19 @@ def get_current_ip(url=GET_IP_URL):
 
 
 def get_dns_ip(name=RECORD_NAME, target='A'):
-    q = dns.resolver.query(name, target)
-    ip = str(q[0]).strip()
-    return ip
+    bits = RECORD_NAME.split('.')
+    while bits:
+        try:
+            ns = str(dns.resolver.query('.'.join(bits), 'NS')[0])
+        except:
+            bits.pop(0)
+        else:
+            ns = socket.gethostbyname(ns)
+            resolver = dns.resolver.Resolver()
+            resolver.nameservers = [ns]
+            q = resolver.query(name, target)
+            ip = str(q[0]).strip()
+            return ip
 
 
 def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
