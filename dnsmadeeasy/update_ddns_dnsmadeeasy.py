@@ -11,22 +11,18 @@
 # License: MIT, https://github.com/wyrmiyu/ddns-tools/blob/master/LICENSE
 
 from __future__ import print_function
+
 import socket
+import json
+import os
 import sys
 import requests
 import dns.resolver
 
-USERNAME = 'your_username'  # <- REPLACE
-PASSWORD = 'dns_record_password'  # <- REPLACE
-RECORD_ID = 'dns_record_id'  # <- REPLACE
-RECORD_NAME = 'recordname.example.com'  # <- REPLACE
-GET_IP_URL = 'http://www.dnsmadeeasy.com/myip.jsp'
-UPDATE_IP_URL = 'https://www.dnsmadeeasy.com/servlet/updateip'
-
 
 def error(*objs):
     print("ERROR:", *objs, file=sys.stderr)
-    return False
+    sys.exit(1)
 
 
 def check_ssl(url):
@@ -37,7 +33,8 @@ def check_ssl(url):
         return error('The SSL certificate for {0} is not valid.'.format(url))
 
 
-def get_current_ip(url=GET_IP_URL):
+def get_current_ip(url=None):
+    url = url or GET_IP_URL
     r = requests.get(url)
     ip = r.text.strip()
     return ip
@@ -59,7 +56,8 @@ def get_dns_ip(name=RECORD_NAME, target='A'):
             return ip
 
 
-def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
+def update_ip_to_dns(ip=False, url=None):
+    url = url or UPDATE_IP_URL
     if not ip:
         return error('Could not determine the current IP.')
     if not check_ssl(url):
@@ -72,13 +70,35 @@ def update_ip_to_dns(ip=False, url=UPDATE_IP_URL):
     }
     return requests.get(url, params=params)
 
+
+BASE_DIR = os.path.dirname(__file__)
+
+try:
+    settings = json.loads(open(os.path.join(BASE_DIR, 'settings.json')).read())
+except IOError:
+    error('No `settings.json` file. Create one from the '
+          '`settings.json.sample` file.')
+except ValueError:
+    error('Invalid `settings.json` file. Check the `settings.json.sample` '
+          'file for an example.')
+
+USERNAME = settings.get('USERNAME', None)
+PASSWORD = settings.get('PASSWORD', None)
+RECORD_ID = settings.get('RECORD_ID', None)
+RECORD_NAME = settings.get('RECORD_NAME', None)
+GET_IP_URL = settings.get('GET_IP_URL', 'http://www.dnsmadeeasy.com/myip.jsp')
+UPDATE_IP_URL = settings.get('UPDATE_IP_URL',
+                             'https://www.dnsmadeeasy.com/servlet/updateip')
+QUIET = settings.get('QUIET', False)
+
+for opt in 'USERNAME', 'PASSWORD', 'RECORD_ID', 'RECORD_NAME':
+    if not locals().get(opt):
+        error('Missing `{0}` setting. Check `settings.json` file.'.format(opt))
+
 if __name__ == '__main__':
-    exit_code = 0
     current_ip = get_current_ip()
     ip_in_dns = get_dns_ip()
-    if current_ip == ip_in_dns:
-        print('No changes for DNS record {0} to report.'.format(RECORD_NAME))
-    else:
+    if current_ip != ip_in_dns:
         print('Current IP differs with DNS record, attempting to update DNS.')
         request = update_ip_to_dns(current_ip)
         if request and request.text == 'success':
@@ -89,5 +109,5 @@ if __name__ == '__main__':
             msg = 'Updating record for {0} to {1} failed.'.format(
                 RECORD_NAME, current_ip)
             error(msg)
-            exit_code = 1
-    sys.exit(exit_code)
+    elif not QUIET:
+        print('No changes for DNS record {0} to report.'.format(RECORD_NAME))
