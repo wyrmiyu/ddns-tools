@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
 # Script to update dynamic DNS records at Dnsmadeeasy with HTTPS support.
-# Change globs to reflect your settings and set to run from cron.
+# Put your settings in settings.json in the same folder with the script 
+# and set to run from cron.
 #
 # Requires following non-core modules;
 #  * python-requests, https://pypi.python.org/pypi/requests/
