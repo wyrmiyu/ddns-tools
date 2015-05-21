@@ -1,0 +1,2 @@
+dnspython>=1.12.0
+requests>=2.7.0
