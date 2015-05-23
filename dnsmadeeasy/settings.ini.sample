@@ -1,0 +1,5 @@
+[settings]
+username = your_username
+password = dns_record_password
+record_id = dns_record_id
+record_name = recordname.example.com

@@ -12,18 +12,19 @@
 # License: MIT, https://github.com/wyrmiyu/ddns-tools/blob/master/LICENSE
 
 from __future__ import print_function
+import ConfigParser
 
 import socket
-import json
 import logging
-import os
 import sys
 import requests
 import dns.resolver
 
-logging.basicConfig(format='%(levelname)s: %(message)s')
 
+logging.basicConfig(format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
+
+CONFIG = {}
 
 
 def error(message):
@@ -42,16 +43,17 @@ def check_ssl(url):
 
 
 def get_current_ip(url=None):
-    url = url or GET_IP_URL
+    url = url or CONFIG['get_ip_url']
     try:
         return requests.get(url).text.strip()
     except requests.ConnectionError:
         logger.debug(
-            'Could not get the current IP from {0}'.format(GET_IP_URL))
+            'Could not get the current'
+            'IP from {0}'.format(CONFIG['get_ip_url']))
 
 
 def get_dns_ip(name=None, target='A'):
-    name = name or RECORD_NAME
+    name = name or CONFIG['record_name']
     bits = name.split('.')
     while bits:
         try:
@@ -69,48 +71,50 @@ def get_dns_ip(name=None, target='A'):
 
 
 def update_ip_to_dns(ip, url=None):
-    url = url or UPDATE_IP_URL
+    url = url or CONFIG['update_ip_url']
     check_ssl(url)
     params = {
-        'username': USERNAME,
-        'password': PASSWORD,
-        'id': RECORD_ID,
+        'username': CONFIG['username'],
+        'password': CONFIG['password'],
+        'id': CONFIG['record_id'],
         'ip': ip,
     }
     return requests.get(url, params=params)
 
 
-BASE_DIR = os.path.dirname(__file__)
+def read_config(config_filename):
+    # Read configuration with provided defaults
+    config_parser = ConfigParser.RawConfigParser(
+        {
+            'get_ip_url': 'http://www.dnsmadeeasy.com/myip.jsp',
+            'update_ip_url': 'https://www.dnsmadeeasy.com/servlet/updateip',
+            'log_level': 'INFO'
+        }
+    )
 
-try:
-    settings = json.loads(open(os.path.join(BASE_DIR, 'settings.json')).read())
-except IOError:
-    error('No `settings.json` file. Create one from the '
-          '`settings.json.sample` file.')
-except ValueError:
-    error('Invalid `settings.json` file. Check the `settings.json.sample` '
-          'file for an example.')
+    try:
+        config_parser.read(config_filename)
+        CONFIG['username'] = config_parser.get('settings', 'USERNAME')
+        CONFIG['password'] = config_parser.get('settings', 'PASSWORD')
+        CONFIG['record_id'] = config_parser.get('settings', 'RECORD_ID')
+        CONFIG['record_name'] = config_parser.get('settings', 'RECORD_NAME')
+        CONFIG['get_ip_url'] = config_parser.get('settings', 'GET_IP_URL')
+        CONFIG['update_ip_url'] = config_parser.get('settings', 'UPDATE_IP_URL')
+        CONFIG['log_level'] = config_parser.get('settings', 'LOG_LEVEL')
+    except ConfigParser.MissingSectionHeaderError:
+        error('Invalid configuration file.')
+    except ConfigParser.NoOptionError as e:
+        error("Required option '{}' is not present in section '{}' of the "
+              "'settings.ini' file.".format(e.option, e.section))
 
-USERNAME = settings.get('USERNAME', None)
-PASSWORD = settings.get('PASSWORD', None)
-RECORD_ID = settings.get('RECORD_ID', None)
-RECORD_NAME = settings.get('RECORD_NAME', None)
-GET_IP_URL = settings.get('GET_IP_URL', 'http://www.dnsmadeeasy.com/myip.jsp')
-UPDATE_IP_URL = settings.get('UPDATE_IP_URL',
-                             'https://www.dnsmadeeasy.com/servlet/updateip')
-LOG_LEVEL = settings.get('LOG_LEVEL', 'INFO')
-
-for opt in 'USERNAME', 'PASSWORD', 'RECORD_ID', 'RECORD_NAME':
-    if not locals().get(opt):
-        error('Missing `{0}` setting. Check `settings.json` file.'.format(opt))
-
-try:
-    logger.setLevel(getattr(logging, LOG_LEVEL))
-except AttributeError:
-    error('Invalid `LOG_LEVEL` setting. Check `settings.json` file. Valid '
-          'log levels are: DEBUG, INFO, WARNING, ERROR, CRITICAL.')
+    try:
+        logger.setLevel(getattr(logging, CONFIG['log_level']))
+    except AttributeError:
+        error('Invalid `log_level` setting. Check `settings.ini` file. Valid '
+              'log levels are: DEBUG, INFO, WARNING, ERROR, CRITICAL.')
 
 if __name__ == '__main__':
+    read_config('settings.ini')
     current_ip = get_current_ip()
     if current_ip:
         if current_ip != get_dns_ip():
@@ -119,10 +123,11 @@ if __name__ == '__main__':
             request = update_ip_to_dns(current_ip)
             if request and request.text == 'success':
                 logger.info('Updating record for {0} to {1} was '
-                            'succesful.'.format(RECORD_NAME, current_ip))
+                            'succesful.'.format(CONFIG['record_name'], current_ip))
             else:
-                error('Updating record for {0} to {1} failed.'.format(
-                    RECORD_NAME, current_ip))
+                error('Updating record for {0} to {1}'
+                      'failed.'.format(CONFIG['record_name'], current_ip))
         else:
             logger.debug(
-                'No changes for DNS record {0} to report.'.format(RECORD_NAME))
+                'No changes for DNS record {0} '
+                'to report.'.format(CONFIG['record_name']))
