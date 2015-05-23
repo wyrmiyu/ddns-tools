@@ -1,6 +1,0 @@
-{
-	"USERNAME": "your_username",
-	"PASSWORD": "dns_record_password",
-	"RECORD_ID": "dns_record_id",
-	"RECORD_NAME": "recordname.example.com"
-}
