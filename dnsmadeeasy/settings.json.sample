@@ -1,6 +1,13 @@
 {
 	"USERNAME": "your_username",
 	"PASSWORD": "dns_record_password",
-	"RECORD_ID": "dns_record_id",
-	"RECORD_NAME": "recordname.example.com"
+	"LOG_LEVEL": "INFO",
+
+	"records": [
+	{ "RECORD_ID": "dns_record_id1",
+	"RECORD_NAME": "recordname1.example.com" },
+
+	{ "RECORD_ID": "dns_record_id2",
+	"RECORD_NAME": "recordname2.example.com" }
+	]
 }
