@@ -95,9 +95,9 @@ USERNAME = settings.get('USERNAME', None)
 PASSWORD = settings.get('PASSWORD', None)
 RECORD_ID = settings.get('RECORD_ID', None)
 RECORD_NAME = settings.get('RECORD_NAME', None)
-GET_IP_URL = settings.get('GET_IP_URL', 'http://www.dnsmadeeasy.com/myip.jsp')
+GET_IP_URL = settings.get('GET_IP_URL', 'http://myip.dnsmadeeasy.com')
 UPDATE_IP_URL = settings.get('UPDATE_IP_URL',
-                             'https://www.dnsmadeeasy.com/servlet/updateip')
+                             'https://cp.dnsmadeeasy.com/servlet/updateip')
 LOG_LEVEL = settings.get('LOG_LEVEL', 'INFO')
 
 for opt in 'USERNAME', 'PASSWORD', 'RECORD_ID', 'RECORD_NAME':
