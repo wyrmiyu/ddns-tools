@@ -46,7 +46,7 @@ def check_ssl(url):
 
 class DME_Account:
     def __init__(self, username, password,
-            url = 'http://www.dnsmadeeasy.com/myip.jsp'):
+            url = 'http://myip.dnsmadeeasy.com/'):
         # Initialise DME account
         self.records = []
         self.USERNAME = settings.get('USERNAME', None)
@@ -60,7 +60,11 @@ class DME_Account:
                 error('Missing `{0}` setting. Check `settings.json` file.'.format(opt))
         # Make sure we are setting a sane log level
         try:
+            formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+            screen_handler = logging.StreamHandler(stream=sys.stdout)
+            screen_handler.setFormatter(formatter)
             logger.setLevel(getattr(logging, self.LOG_LEVEL))
+            logger.addHandler(screen_handler)
         except AttributeError:
             error('Invalid `LOG_LEVEL` setting. Check `settings.json` file. Valid '
                   'log levels are: DEBUG, INFO, WARNING, ERROR, CRITICAL.')
