@@ -8,7 +8,7 @@
 #  * python-requests, https://pypi.python.org/pypi/requests/
 #  * python-dns, https://pypi.python.org/pypi/dnspython/
 #
-# Author: Pekka Wallendahl <wyrmiyu@gmail.com>
+# Author: Sandi Wallendahl <wyrmiyu@gmail.com>
 # License: MIT, https://github.com/wyrmiyu/ddns-tools/blob/master/LICENSE
 
 from __future__ import print_function
